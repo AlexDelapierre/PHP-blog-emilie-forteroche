@@ -31,7 +31,7 @@ class ArticleController
             throw new Exception("L'article demandé n'existe pas.");
         }
 
-        // --- MISE À JOUR : Incrémentation du compteur de vues ---
+        // --- Incrémentation du compteur de vues ---
         $articleManager->incrementViews($id);
         // On met aussi à jour l'objet en mémoire pour que la vue affiche le bon chiffre
         $article->setViews($article->getViews() + 1);
