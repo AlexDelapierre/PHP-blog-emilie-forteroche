@@ -21,8 +21,8 @@ try {
             $articleController = new ArticleController();
             $articleController->showApropos();
             break;
-        
-        case 'showArticle': 
+
+        case 'showArticle':
             $articleController = new ArticleController();
             $articleController->showArticle();
             break;
@@ -38,8 +38,8 @@ try {
             break;
 
 
-        // Section admin & connexion. 
-        case 'admin': 
+        // Section admin & connexion.
+        case 'admin':
             $adminController = new AdminController();
             $adminController->showAdmin();
             break;
@@ -49,7 +49,7 @@ try {
             $adminController->displayConnectionForm();
             break;
 
-        case 'connectUser': 
+        case 'connectUser':
             $adminController = new AdminController();
             $adminController->connectUser();
             break;
@@ -59,12 +59,17 @@ try {
             $adminController->disconnectUser();
             break;
 
+        case 'showArticleList':
+            $adminController = new AdminController();
+            $adminController->showArticlesList();
+            break;
+
         case 'showUpdateArticleForm':
             $adminController = new AdminController();
             $adminController->showUpdateArticleForm();
             break;
 
-        case 'updateArticle': 
+        case 'updateArticle':
             $adminController = new AdminController();
             $adminController->updateArticle();
             break;
@@ -72,6 +77,11 @@ try {
         case 'deleteArticle':
             $adminController = new AdminController();
             $adminController->deleteArticle();
+            break;
+
+        case 'deleteComment':
+            $adminController = new AdminController();
+            $adminController->deleteComment();
             break;
 
         default:
