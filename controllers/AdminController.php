@@ -1,15 +1,17 @@
-<?php 
+<?php
+
 /**
  * Contrôleur de la partie admin.
  */
- 
-class AdminController {
+
+class AdminController
+{
 
     /**
      * Affiche la page d'administration.
      * @return void
      */
-    public function showAdmin() : void
+    public function showAdmin(): void
     {
         // On vérifie que l'utilisateur est connecté.
         $this->checkIfUserIsConnected();
@@ -29,7 +31,7 @@ class AdminController {
      * Vérifie que l'utilisateur est connecté.
      * @return void
      */
-    private function checkIfUserIsConnected() : void
+    private function checkIfUserIsConnected(): void
     {
         // On vérifie que l'utilisateur est connecté.
         if (!isset($_SESSION['user'])) {
@@ -41,7 +43,7 @@ class AdminController {
      * Affichage du formulaire de connexion.
      * @return void
      */
-    public function displayConnectionForm() : void 
+    public function displayConnectionForm(): void
     {
         $view = new View("Connexion");
         $view->render("connectionForm");
@@ -51,7 +53,7 @@ class AdminController {
      * Connexion de l'utilisateur.
      * @return void
      */
-    public function connectUser() : void 
+    public function connectUser(): void
     {
         // On récupère les données du formulaire.
         $login = Utils::request("login");
@@ -87,7 +89,7 @@ class AdminController {
      * Déconnexion de l'utilisateur.
      * @return void
      */
-    public function disconnectUser() : void 
+    public function disconnectUser(): void
     {
         // On déconnecte l'utilisateur.
         unset($_SESSION['user']);
@@ -96,11 +98,32 @@ class AdminController {
         Utils::redirect("home");
     }
 
+    public function showArticlesList(): void
+    {
+        $this->checkIfUserIsConnected();
+
+        // On récupère les paramètres de tri, avec des valeurs par défaut
+        $sort = $_GET['sort'] ?? 'date_creation';
+        $order = $_GET['order'] ?? 'DESC';
+
+        // On récupère les articles.
+        $articleManager = new ArticleManager();
+        $articles = $articleManager->getAllArticles($sort, $order);
+
+        // On affiche la page de liste des articles.
+        $view = new View("Liste des articles");
+        $view->render("articlesList", [
+            'articles' => $articles,
+            'currentSort' => $sort,
+            'currentOrder' => $order
+        ]);
+    }
+
     /**
      * Affichage du formulaire d'ajout d'un article.
      * @return void
      */
-    public function showUpdateArticleForm() : void 
+    public function showUpdateArticleForm(): void
     {
         $this->checkIfUserIsConnected();
 
@@ -111,7 +134,7 @@ class AdminController {
         $articleManager = new ArticleManager();
         $article = $articleManager->getArticleById($id);
 
-        // Si l'article n'existe pas, on en crée un vide. 
+        // Si l'article n'existe pas, on en crée un vide.
         if (!$article) {
             $article = new Article();
         }
@@ -124,11 +147,11 @@ class AdminController {
     }
 
     /**
-     * Ajout et modification d'un article. 
+     * Ajout et modification d'un article.
      * On sait si un article est ajouté car l'id vaut -1.
      * @return void
      */
-    public function updateArticle() : void 
+    public function updateArticle(): void
     {
         $this->checkIfUserIsConnected();
 
@@ -144,7 +167,7 @@ class AdminController {
 
         // On crée l'objet Article.
         $article = new Article([
-            'id' => $id, // Si l'id vaut -1, l'article sera ajouté. Sinon, il sera modifié.
+            'id' => $id,
             'title' => $title,
             'content' => $content,
             'id_user' => $_SESSION['idUser']
@@ -163,7 +186,7 @@ class AdminController {
      * Suppression d'un article.
      * @return void
      */
-    public function deleteArticle() : void
+    public function deleteArticle(): void
     {
         $this->checkIfUserIsConnected();
 
@@ -172,8 +195,28 @@ class AdminController {
         // On supprime l'article.
         $articleManager = new ArticleManager();
         $articleManager->deleteArticle($id);
-       
+
         // On redirige vers la page d'administration.
         Utils::redirect("admin");
+    }
+
+    /**
+     * Suppression d'un commentaire.
+     * @return void
+     */
+    public function deleteComment(): void
+    {
+        $this->checkIfUserIsConnected();
+
+        // On récupère l'ID du commentaire ET l'ID de l'article
+        $id = Utils::request("id", -1);
+        $idArticle = Utils::request("idArticle", -1);
+
+        // On supprime le commentaire
+        $commentManager = new CommentManager();
+        $commentManager->deleteComment($id);
+
+        // On redirige vers l'article spécifique
+        Utils::redirect("showArticle", ['id' => $idArticle]);
     }
 }
